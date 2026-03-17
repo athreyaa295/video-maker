@@ -1,42 +1,48 @@
 const ProgressIndicator = ({ status, message }) => {
+  const steps = [
+    { label: 'Upload', key: 'uploading' },
+    { label: 'Whisper', key: 'transcribing' },
+    { label: 'Qwen VL', key: 'scoring' },
+    { label: 'Stitch',  key: 'stitching' },
+  ];
+
+  const activeIdx = status === 'uploading' ? 0
+    : message?.toLowerCase().includes('whisper') ? 1
+    : message?.toLowerCase().includes('qwen') ? 2
+    : message?.toLowerCase().includes('stitch') ? 3
+    : 1;
+
   return (
-    <div className="glass-panel p-8 w-full max-w-xl text-center">
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">
-          {status === 'uploading' ? 'Uploading...' : 'Processing Highlights...'}
-        </h2>
-        <p className="text-slate-400 h-6">
-          {message}
-        </p>
+    <div style={{ background: '#1E1E1E', border: '1px solid rgba(255,255,255,0.07)', borderRadius: '1rem', padding: '2.5rem', width: '100%', textAlign: 'center', boxShadow: '0 4px 24px rgba(0,0,0,0.4)' }}>
+      <h2 style={{ fontSize: '1.4rem', fontWeight: 800, color: '#fff', marginBottom: '0.5rem' }}>
+        {status === 'uploading' ? '📤 Uploading...' : '⚙️ Processing Highlights...'}
+      </h2>
+      <p style={{ color: '#B0B0B0', fontSize: '0.9rem', marginBottom: '2rem', minHeight: '1.5rem' }}>{message}</p>
+
+      {/* Progress bar */}
+      <div style={{ background: '#2A2A2A', borderRadius: '999px', height: '8px', overflow: 'hidden', marginBottom: '2rem' }}>
+        <div className="progress-bar-animated" style={{
+          height: '8px',
+          borderRadius: '999px',
+          width: status === 'uploading' ? '30%' : '85%',
+          transition: 'width 0.8s ease-in-out'
+        }} />
       </div>
-      
-      <div className="w-full bg-slate-800 rounded-full h-3 mb-4 overflow-hidden shadow-inner">
-        <div 
-           className="progress-bar-animated h-3 rounded-full w-full" 
-           style={{ 
-             width: status === 'uploading' ? '50%' : '100%',
-             transition: 'width 0.5s ease-in-out'
-           }}
-        ></div>
-      </div>
-      
-      <div className="grid grid-cols-4 gap-4 mt-8 opacity-70">
-        <div className={`flex flex-col items-center ${status === 'uploading' || status === 'processing' ? 'text-blue-400' : 'text-slate-500'}`}>
-          <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center mb-2">1</div>
-          <span className="text-xs font-semibold">Upload</span>
-        </div>
-        <div className={`flex flex-col items-center ${status === 'processing' && message.includes('audio') ? 'text-purple-400' : 'text-slate-500'}`}>
-          <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center mb-2">2</div>
-          <span className="text-xs font-semibold">Whisper</span>
-        </div>
-        <div className={`flex flex-col items-center ${status === 'processing' && message.includes('Qwen') ? 'text-pink-400' : 'text-slate-500'}`}>
-          <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center mb-2">3</div>
-          <span className="text-xs font-semibold">Qwen VL</span>
-        </div>
-        <div className={`flex flex-col items-center ${status === 'processing' && message.includes('Stitching') ? 'text-green-400' : 'text-slate-500'}`}>
-          <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center mb-2">4</div>
-          <span className="text-xs font-semibold">Stitch</span>
-        </div>
+
+      {/* Step indicators */}
+      <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', flexWrap: 'wrap' }}>
+        {steps.map((step, i) => (
+          <div key={step.key} style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.4rem' }}>
+            <div
+              className={`step-dot ${i < activeIdx ? 'done' : i === activeIdx ? 'active' : ''}`}
+            >
+              {i < activeIdx ? '✓' : i + 1}
+            </div>
+            <span style={{ fontSize: '0.7rem', color: i === activeIdx ? '#2196F3' : '#555', fontWeight: i === activeIdx ? 700 : 400 }}>
+              {step.label}
+            </span>
+          </div>
+        ))}
       </div>
     </div>
   );

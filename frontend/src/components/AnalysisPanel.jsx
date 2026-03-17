@@ -1,98 +1,100 @@
 const AnalysisPanel = ({ analysis }) => {
-  if (!analysis || Object.keys(analysis).length === 0) return null;
+  const isEmpty = !analysis || Object.keys(analysis).length === 0;
+
+  const card = (icon, title, color, children) => (
+    <div className="analysis-card" key={title}>
+      <div className="card-title" style={{ color }}>
+        <span>{icon}</span> {title}
+      </div>
+      {children}
+    </div>
+  );
+
+  if (isEmpty) {
+    return (
+      <div style={{ width: '100%', marginTop: '2rem' }}>
+        <h2 style={{ textAlign: 'center', fontWeight: 800, fontSize: '1.5rem', marginBottom: '1rem' }}>
+          <span className="gradient-text">📊 AI Analysis</span>
+        </h2>
+        <div style={{ background: '#1E1E1E', border: '1px dashed rgba(255,255,255,0.1)', borderRadius: '1rem', padding: '2.5rem', textAlign: 'center' }}>
+          <p style={{ fontSize: '1.1rem', color: '#B0B0B0', marginBottom: '0.5rem' }}>🤖 AI Analysis Unavailable</p>
+          <p style={{ color: '#555', fontSize: '0.85rem', maxWidth: '400px', margin: '0 auto 1rem' }}>
+            Make sure <span style={{ color: '#7C3AED', fontWeight: 700 }}>Ollama is running</span> with Qwen 2.5 3B VL, then re-process a video.
+          </p>
+          <code style={{ display: 'block', background: '#252525', color: '#4CAF50', fontSize: '0.75rem', borderRadius: '0.5rem', padding: '0.6rem 1rem', width: 'fit-content', margin: '0 auto' }}>
+            ollama run qwen2.5vl:3b-q4_K_M
+          </code>
+        </div>
+      </div>
+    );
+  }
 
   const { subtitles, impact_analysis, titles, notes, full_analysis, pause_analysis } = analysis;
 
   return (
-    <div className="w-full max-w-4xl mt-10 space-y-6 animate-fade-in">
-      <h2 className="text-2xl font-bold text-center gradient-text">📊 AI Analysis</h2>
+    <div style={{ width: '100%', marginTop: '2rem' }}>
+      <h2 style={{ textAlign: 'center', fontWeight: 800, fontSize: '1.5rem', marginBottom: '1.5rem' }}>
+        <span className="gradient-text">📊 AI Analysis</span>
+      </h2>
 
-      {/* Subtitles */}
-      {subtitles && (
-        <div className="glass-panel p-5">
-          <h3 className="text-lg font-semibold text-blue-400 mb-2">📝 Enhanced Subtitles</h3>
-          <p className="text-slate-300 text-sm leading-relaxed whitespace-pre-line">{subtitles}</p>
-        </div>
-      )}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        {subtitles && card('📝', 'Enhanced Subtitles', '#2196F3',
+          <p style={{ color: '#B0B0B0', fontSize: '0.875rem', lineHeight: 1.7, whiteSpace: 'pre-line' }}>{subtitles}</p>
+        )}
 
-      {/* Impact Analysis */}
-      {impact_analysis && (
-        <div className="glass-panel p-5">
-          <h3 className="text-lg font-semibold text-purple-400 mb-2">⚡ Impact Analysis</h3>
-          <div className="flex flex-wrap gap-4 items-center">
-            <span className="px-3 py-1 rounded-full bg-purple-900/40 border border-purple-500/30 text-purple-300 text-sm font-semibold">
-              Type: {impact_analysis.type}
-            </span>
-            <span className="px-3 py-1 rounded-full bg-blue-900/40 border border-blue-500/30 text-blue-300 text-sm font-semibold">
-              Score: {impact_analysis.score} / 10
-            </span>
+        {impact_analysis && card('⚡', 'Impact Analysis', '#FF5722',
+          <div>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap', marginBottom: '0.75rem' }}>
+              <span className="neon-badge purple">Type: {impact_analysis.type}</span>
+              <span className="neon-badge orange">Score: {impact_analysis.score} / 10</span>
+            </div>
+            {impact_analysis.reason && <p style={{ color: '#B0B0B0', fontSize: '0.875rem' }}>{impact_analysis.reason}</p>}
           </div>
-          {impact_analysis.reason && (
-            <p className="text-slate-300 text-sm mt-3">{impact_analysis.reason}</p>
-          )}
-        </div>
-      )}
+        )}
 
-      {/* Viral Titles */}
-      {titles && titles.length > 0 && (
-        <div className="glass-panel p-5">
-          <h3 className="text-lg font-semibold text-pink-400 mb-3">🔥 Viral Titles</h3>
-          <ol className="space-y-2">
-            {titles.map((title, i) => (
-              <li key={i} className="flex items-start gap-2">
-                <span className="text-pink-400 font-bold text-sm min-w-[20px]">{i + 1}.</span>
-                <span className="text-slate-200 text-sm">{title}</span>
-              </li>
+        {titles?.length > 0 && card('🔥', 'Viral Titles', '#FF6B6B',
+          <ol style={{ margin: 0, padding: '0 0 0 1.25rem', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+            {titles.map((t, i) => (
+              <li key={i} style={{ color: '#fff', fontSize: '0.875rem' }}>{t}</li>
             ))}
           </ol>
-        </div>
-      )}
+        )}
 
-      {/* Notes */}
-      {notes && (
-        <div className="glass-panel p-5">
-          <h3 className="text-lg font-semibold text-green-400 mb-2">📋 Key Notes</h3>
-          {notes.summary && <p className="text-slate-300 text-sm mb-3">{notes.summary}</p>}
-          {notes.key_points && notes.key_points.length > 0 && (
-            <ul className="space-y-1">
-              {notes.key_points.map((pt, i) => (
-                <li key={i} className="text-slate-200 text-sm flex items-start gap-2">
-                  <span className="text-green-400 mt-1">•</span>
-                  <span>{pt}</span>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      )}
+        {notes && card('📋', 'Key Notes', '#4CAF50',
+          <div>
+            {notes.summary && <p style={{ color: '#B0B0B0', fontSize: '0.875rem', marginBottom: '0.75rem' }}>{notes.summary}</p>}
+            {notes.key_points?.length > 0 && (
+              <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
+                {notes.key_points.map((p, i) => (
+                  <li key={i} style={{ color: '#eee', fontSize: '0.875rem', display: 'flex', gap: '0.5rem' }}>
+                    <span style={{ color: '#4CAF50' }}>•</span> {p}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        )}
 
-      {/* Full Analysis */}
-      {full_analysis && (
-        <div className="glass-panel p-5">
-          <h3 className="text-lg font-semibold text-yellow-400 mb-2">🎬 Full Video Analysis</h3>
-          {full_analysis.summary && <p className="text-slate-300 text-sm mb-3">{full_analysis.summary}</p>}
-          {full_analysis.key_topics && full_analysis.key_topics.length > 0 && (
-            <div className="flex flex-wrap gap-2 mb-2">
-              {full_analysis.key_topics.map((topic, i) => (
-                <span key={i} className="px-2 py-1 rounded-md bg-yellow-900/30 border border-yellow-500/20 text-yellow-300 text-xs">
-                  {topic}
-                </span>
-              ))}
-            </div>
-          )}
-          {full_analysis.tone && (
-            <p className="text-slate-400 text-xs">Tone: <span className="text-slate-200">{full_analysis.tone}</span></p>
-          )}
-        </div>
-      )}
+        {full_analysis && card('🎬', 'Full Video Analysis', '#FFC107',
+          <div>
+            {full_analysis.summary && <p style={{ color: '#B0B0B0', fontSize: '0.875rem', marginBottom: '0.75rem' }}>{full_analysis.summary}</p>}
+            {full_analysis.key_topics?.length > 0 && (
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '0.5rem' }}>
+                {full_analysis.key_topics.map((t, i) => (
+                  <span key={i} className="neon-badge blue">{t}</span>
+                ))}
+              </div>
+            )}
+            {full_analysis.tone && (
+              <p style={{ color: '#555', fontSize: '0.75rem' }}>Tone: <span style={{ color: '#B0B0B0' }}>{full_analysis.tone}</span></p>
+            )}
+          </div>
+        )}
 
-      {/* Pause Analysis */}
-      {pause_analysis && (
-        <div className="glass-panel p-5">
-          <h3 className="text-lg font-semibold text-cyan-400 mb-2">⏸️ Pause Analysis</h3>
-          <p className="text-slate-300 text-sm">{pause_analysis}</p>
-        </div>
-      )}
+        {pause_analysis && card('⏸️', 'Pause Analysis', '#A78BFA',
+          <p style={{ color: '#B0B0B0', fontSize: '0.875rem' }}>{pause_analysis}</p>
+        )}
+      </div>
     </div>
   );
 };

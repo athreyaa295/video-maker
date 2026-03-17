@@ -7,8 +7,7 @@ import AnalysisPanel from './components/AnalysisPanel';
 import './styles/App.scss';
 
 function App() {
-  const [taskId, setTaskId] = useState(null);
-  const [status, setStatus] = useState('idle'); // idle, uploading, processing, completed, error
+  const [status, setStatus] = useState('idle');
   const [message, setMessage] = useState('');
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [analysis, setAnalysis] = useState(null);
@@ -16,7 +15,6 @@ function App() {
   const handleUpload = async (file) => {
     setStatus('uploading');
     setMessage('Uploading video...');
-    
     const formData = new FormData();
     formData.append('file', file);
 
@@ -24,15 +22,10 @@ function App() {
       const response = await axios.post('http://localhost:8000/upload', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       });
-      
-      setTaskId(response.data.task_id);
       setStatus('processing');
       setMessage(response.data.message);
-      
-      // Start polling for status
       pollStatus(response.data.task_id);
     } catch (error) {
-      console.error("Upload failed", error);
       setStatus('error');
       setMessage('Upload failed. Please check the backend server.');
     }
@@ -43,30 +36,24 @@ function App() {
       try {
         const res = await axios.get(`http://localhost:8000/status/${id}`);
         setMessage(res.data.message || 'Processing...');
-        
         if (res.data.status === 'completed') {
           clearInterval(interval);
           setStatus('completed');
           setDownloadUrl(`http://localhost:8000/download/${id}`);
-          // Fetch rich AI analysis
           try {
             const aRes = await axios.get(`http://localhost:8000/analysis/${id}`);
             setAnalysis(aRes.data);
-          } catch (_) { /* analysis optional */ }
+          } catch (_) {}
         } else if (res.data.status === 'error' || res.data.status === 'failed') {
           clearInterval(interval);
           setStatus('error');
           setMessage(res.data.message || 'Processing failed');
         }
-      } catch (err) {
-        // Just keep polling unless it's a hard error
-        console.error("Polling error", err);
-      }
-    }, 3000); // poll every 3 seconds
+      } catch (err) {}
+    }, 3000);
   };
 
   const resetApp = () => {
-    setTaskId(null);
     setStatus('idle');
     setMessage('');
     setDownloadUrl(null);
@@ -74,62 +61,85 @@ function App() {
   };
 
   return (
-    <div className="min-h-screen p-8 text-slate-100 font-sans flex flex-col items-center">
+    <div style={{ background: '#121212', minHeight: '100vh' }} className="p-8 text-white flex flex-col items-center">
+      {/* Header */}
       <header className="mb-12 text-center">
-        <h1 className="text-5xl font-extrabold mb-4 tracking-tight">
-          HMX<span className="gradient-text">1008</span>
-        </h1>
-        <p className="text-slate-400 text-lg max-w-2xl mx-auto">
-          Automated Video Highlight Extraction powered by Qwen 2.5 3B VL & Whisper
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <span style={{ fontSize: '2rem' }}>🎬</span>
+          <h1 style={{ fontSize: '3rem', fontWeight: '900', letterSpacing: '-0.02em', lineHeight: 1 }}>
+            HMX<span className="gradient-text">1008</span>
+          </h1>
+        </div>
+        <p style={{ color: '#B0B0B0', fontSize: '1rem', maxWidth: '500px', margin: '0 auto' }}>
+          GPU-Powered Video Highlight Extraction · Whisper · Qwen 2.5 3B VL
         </p>
+        {/* Stat chips */}
+        <div className="flex justify-center gap-3 mt-5 flex-wrap">
+          <span className="neon-badge blue">🖥 GPU Accelerated</span>
+          <span className="neon-badge purple">🧠 AI Scoring</span>
+          <span className="neon-badge green">⚡ Real-time</span>
+          <span className="neon-badge orange">🎞 60s Reels</span>
+        </div>
       </header>
 
-      <main className="w-full max-w-4xl flex-1 flex flex-col items-center gap-8">
+      <main className="w-full flex flex-col items-center gap-8" style={{ maxWidth: '900px' }}>
         {status === 'idle' && <UploadForm onUpload={handleUpload} />}
-        
+
         {(status === 'uploading' || status === 'processing') && (
           <ProgressIndicator status={status} message={message} />
         )}
-        
+
         {status === 'completed' && downloadUrl && (
-          <div className="w-full flex flex-col items-center animate-fade-in">
-            {analysis && <AnalysisPanel analysis={analysis} />}
-            <VideoPlayer url={downloadUrl} />
-            <div className="mt-8 flex gap-4">
-               <a 
-                 href={downloadUrl}
-                 download="highlight.mp4"
-                 className="glow-btn bg-gradient-to-r from-blue-600 to-purple-600 px-8 py-3 rounded-full font-semibold text-white transition-transform"
-               >
-                 Download Video
-               </a>
-               <button 
-                 onClick={resetApp}
-                 className="px-8 py-3 rounded-full font-semibold bg-slate-800 text-white hover:bg-slate-700 transition-colors border border-slate-700"
-               >
-                 Process Another
-               </button>
+          <div className="w-full flex flex-col items-center gap-8 animate-fade-in">
+            {/* Status banner */}
+            <div style={{ background: 'rgba(76,175,80,0.1)', border: '1px solid rgba(76,175,80,0.3)', borderRadius: '0.75rem', padding: '0.75rem 1.5rem' }}
+                 className="flex items-center gap-2 text-sm">
+              <span style={{ color: '#4CAF50' }}>✅</span>
+              <span style={{ color: '#4CAF50', fontWeight: 600 }}>Highlight extraction complete!</span>
             </div>
-            <p className="mt-4 text-green-400 font-medium">✨ Highlight extraction complete!</p>
+
+            {/* Video player */}
+            <VideoPlayer url={downloadUrl} />
+
+            {/* Action buttons */}
+            <div className="flex gap-4 flex-wrap justify-center">
+              <a
+                href={downloadUrl}
+                download="highlight.mp4"
+                className="glow-btn"
+                style={{ background: 'linear-gradient(135deg,#2196F3,#7C3AED)', color: '#fff', padding: '0.75rem 2rem', borderRadius: '999px', textDecoration: 'none', fontWeight: 700 }}
+              >
+                ⬇ Download Highlight
+              </a>
+              <button
+                onClick={resetApp}
+                style={{ background: '#1E1E1E', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '0.75rem 2rem', borderRadius: '999px', fontWeight: 600, cursor: 'pointer' }}
+              >
+                ↩ Process Another
+              </button>
+            </div>
+
+            {/* AI Analysis Panel */}
+            <AnalysisPanel analysis={analysis} />
           </div>
         )}
-        
+
         {status === 'error' && (
-          <div className="glass-panel p-8 text-center border-red-500/30">
-             <h3 className="text-xl text-red-400 mb-2">Error Occurred</h3>
-             <p className="text-slate-300 mb-6">{message}</p>
-             <button 
-                 onClick={resetApp}
-                 className="px-6 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 transition-colors"
-               >
-                 Try Again
-             </button>
+          <div style={{ background: 'rgba(255,107,107,0.05)', border: '1px solid rgba(255,107,107,0.25)', borderRadius: '1rem', padding: '2.5rem', textAlign: 'center', width: '100%' }}>
+            <p style={{ fontSize: '1.25rem', color: '#FF6B6B', marginBottom: '0.5rem' }}>⚠ Error Occurred</p>
+            <p style={{ color: '#B0B0B0', marginBottom: '1.5rem' }}>{message}</p>
+            <button
+              onClick={resetApp}
+              style={{ background: '#1E1E1E', border: '1px solid rgba(255,255,255,0.1)', color: '#fff', padding: '0.6rem 1.75rem', borderRadius: '0.5rem', cursor: 'pointer', fontWeight: 600 }}
+            >
+              Try Again
+            </button>
           </div>
         )}
       </main>
-      
-      <footer className="mt-16 text-slate-500 text-sm">
-        <p>HMX1008 Project &copy; {new Date().getFullYear()} • GPU Optimized</p>
+
+      <footer className="mt-20" style={{ color: '#444', fontSize: '0.8rem', textAlign: 'center' }}>
+        <p>HMX1008 &copy; {new Date().getFullYear()} · GPU Optimized · Dark Theme</p>
       </footer>
     </div>
   );
