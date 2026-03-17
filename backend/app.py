@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, JSONResponse
 import uuid
 import shutil
-from extract_highlights import process_video
+from extract_highlights import process_video, explain_moment
 
 app = FastAPI(title="HMX1008 - Video Highlight Extraction")
 
@@ -52,12 +52,13 @@ async def upload_video(background_tasks: BackgroundTasks, file: UploadFile = Fil
 def run_pipeline(task_id: str, input_path: str, output_path: str):
     try:
         tasks_status[task_id]["message"] = "Extracting audio and transcribing..."
-        rich_analysis = process_video(input_path, output_path, status_callback=lambda msg: update_status(task_id, msg))
+        rich_analysis, transcript_segments = process_video(input_path, output_path, status_callback=lambda msg: update_status(task_id, msg))
         tasks_status[task_id] = {
             "status": "completed",
             "output_file": output_path,
             "message": "Highlight extraction complete.",
-            "analysis": rich_analysis or {}
+            "analysis": rich_analysis or {},
+            "transcript_segments": transcript_segments or []
         }
     except Exception as e:
         tasks_status[task_id] = {"status": "failed", "message": str(e)}
@@ -100,4 +101,28 @@ async def get_analysis(task_id: str):
 def health_check():
     import torch
     return {"status": "ok", "gpu_enabled": torch.cuda.is_available()}
+@app.get("/analyze_moment/{task_id}/{timestamp}")
+async def analyze_moment(task_id: str, timestamp: float):
+    if task_id not in tasks_status:
+        return JSONResponse(status_code=404, content={"message": "Task not found"})
+    
+    task_data = tasks_status[task_id]
+    segments = task_data.get("transcript_segments", [])
+    
+    if not segments:
+        # Try to load from sidecar if not in memory (e.g. server restart)
+        output_path = task_data.get("output_file")
+        if output_path:
+            transcript_path = output_path.replace(".mp4", "_transcript.json")
+            if os.path.exists(transcript_path):
+                import json
+                with open(transcript_path, "r", encoding="utf-8") as f:
+                    segments = json.load(f)
+                    task_data["transcript_segments"] = segments
+
+    if not segments:
+        return JSONResponse(status_code=400, content={"message": "No transcript data available for this video"})
+
+    explanation = explain_moment(segments, timestamp)
+    return {"explanation": explanation, "timestamp": timestamp}
 

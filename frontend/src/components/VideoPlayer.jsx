@@ -1,7 +1,16 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, forwardRef, useImperativeHandle } from 'react';
 
-const VideoPlayer = ({ url }) => {
+const VideoPlayer = forwardRef(({ url }, ref) => {
   const videoRef = useRef(null);
+
+  useImperativeHandle(ref, () => ({
+    get currentTime() {
+      return videoRef.current?.currentTime || 0;
+    },
+    pause() {
+      videoRef.current?.pause();
+    }
+  }));
 
   useEffect(() => {
     if (videoRef.current) videoRef.current.load();
@@ -21,6 +30,7 @@ const VideoPlayer = ({ url }) => {
       </div>
     </div>
   );
-};
+});
 
+VideoPlayer.displayName = 'VideoPlayer';
 export default VideoPlayer;

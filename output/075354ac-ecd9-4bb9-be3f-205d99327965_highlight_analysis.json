@@ -1,0 +1,66 @@
+{
+  "subtitles": [
+    [
+      "You will receive",
+      "Audio unavailable or failed to transcribe."
+    ],
+    [
+      "Full transcript:",
+      "You will receive:"
+    ],
+    [
+      "Input:",
+      ""
+    ],
+    [
+      "Task 1: SUBTITLE ENHANCEMENT"
+    ],
+    [
+      "- Convert raw transcript into clean, grammatically correct subtitles"
+    ],
+    [
+      "- Add punctuation"
+    ],
+    [
+      "- Highlight important words for engagement"
+    ],
+    [
+      "- Keep subtitles short and readable for reels"
+    ]
+  ],
+  "impact_analysis": {
+    "type": "Educational",
+    "score": "8/10",
+    "reason": "The segment focuses on providing comprehensive information about a topic in an educational context, making it engaging but also informative."
+  },
+  "titles": [
+    [
+      "How to Boost Your Productivity with Efficient Time Management Techniques"
+    ],
+    [
+      "Mastering the Art of Effective Learning: Tips for Success"
+    ],
+    [
+      "Unlocking Your Full Potential Through Continuous Learning"
+    ]
+  ],
+  "notes": {
+    "summary": "The transcript discusses various techniques and methods related to enhancing productivity, including time management, learning strategies, and continuous growth. Key concepts include prioritization, effective study habits, and the importance of self-improvement.",
+    "key_points": [
+      "Time Management",
+      "Effective Study Habits",
+      "Self-Improvement"
+    ]
+  },
+  "full_analysis": {
+    "summary": "The video discusses various ways to improve productivity by managing time effectively and adopting good learning strategies. It emphasizes continuous improvement and personal development as crucial for achieving success.",
+    "key_topics": [
+      "Productivity Techniques",
+      "Time Management",
+      "Learning Strategies",
+      "Continuous Growth"
+    ],
+    "tone": "Educational, Informative"
+  },
+  "pause_analysis": "At 3.5s to 4.5s, the speaker is likely explaining or introducing a new concept related to time management techniques."
+}

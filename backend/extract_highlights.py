@@ -91,6 +91,36 @@ Output MUST be valid JSON matching the exact output format defined.
     except Exception as e:
         print(f"[LLM] Rich analysis failed: {e}")
         return {}
+def explain_moment(transcript_segments: list, timestamp: float) -> str:
+    """Find the relevant segment for a timestamp and ask the LLM to explain it."""
+    # Find segments within +/- 5 seconds of the timestamp for context
+    context_segments = [
+        s.get("text", "") 
+        for s in transcript_segments 
+        if s.get("start", 0) <= timestamp + 2 and s.get("end", 0) >= timestamp - 5
+    ]
+    
+    snippet = " ".join(context_segments).strip()
+    if not snippet:
+        return "No clear dialogue detected at this moment."
+
+    user_prompt = f"""
+Explain exactly what is happening or being discussed at this specific moment in the video.
+Context snippet (around {timestamp:.1f}s):
+"{snippet}"
+
+Return a concise, engaging 1-2 sentence explanation.
+Return ONLY a strict JSON object with this exact key:
+{{
+  "explanation": "your explanation here"
+}}
+"""
+    try:
+        result = call_ollama(SYSTEM_PROMPT, user_prompt)
+        return result.get("explanation", "Could not generate explanation.")
+    except Exception as e:
+        print(f"[LLM] Moment explanation failed: {e}")
+        return "AI analysis failed for this moment."
 
 
 def process_video(input_path: str, output_path: str, status_callback=None):
@@ -136,11 +166,13 @@ def process_video(input_path: str, output_path: str, status_callback=None):
 
     # 2. Whisper transcription (GPU accelerated)
     transcript = ""
+    transcript_segments = []
     try:
         whisper_model = whisper.load_model("base", device=device)
         result = whisper_model.transcribe(input_path)
         transcript = result.get("text", "")
-        print(f"[Whisper] Transcribed {len(transcript)} chars")
+        transcript_segments = result.get("segments", [])
+        print(f"[Whisper] Transcribed {len(transcript)} chars and {len(transcript_segments)} segments")
     except Exception as e:
         print(f"[Whisper] Transcription failed: {e}")
         transcript = "Audio unavailable or failed to transcribe."
@@ -167,7 +199,13 @@ def process_video(input_path: str, output_path: str, status_callback=None):
     analysis_path = output_path.replace(".mp4", "_analysis.json")
     with open(analysis_path, "w", encoding="utf-8") as f:
         json.dump(rich_analysis, f, indent=2, ensure_ascii=False)
-    print(f"[Analysis] Saved rich analysis to {analysis_path}")
+    
+    # Save transcript segments as sidecar JSON file
+    transcript_path = output_path.replace(".mp4", "_transcript.json")
+    with open(transcript_path, "w", encoding="utf-8") as f:
+        json.dump(transcript_segments, f, indent=2, ensure_ascii=False)
+        
+    print(f"[Analysis] Saved rich analysis to {analysis_path} and transcript to {transcript_path}")
 
     if status_callback:
         status_callback("Stitching final highlight video...")

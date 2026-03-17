@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import axios from 'axios';
 import UploadForm from './components/UploadForm';
 import ProgressIndicator from './components/ProgressIndicator';
@@ -11,6 +11,10 @@ function App() {
   const [message, setMessage] = useState('');
   const [downloadUrl, setDownloadUrl] = useState(null);
   const [analysis, setAnalysis] = useState(null);
+  const [taskId, setTaskId] = useState(null);
+  const [momentExplanation, setMomentExplanation] = useState(null);
+  const [isAnalyzingMoment, setIsAnalyzingMoment] = useState(false);
+  const videoRef = useRef(null);
 
   const handleUpload = async (file) => {
     setStatus('uploading');
@@ -24,6 +28,7 @@ function App() {
       });
       setStatus('processing');
       setMessage(response.data.message);
+      setTaskId(response.data.task_id);
       pollStatus(response.data.task_id);
     } catch (error) {
       setStatus('error');
@@ -58,6 +63,28 @@ function App() {
     setMessage('');
     setDownloadUrl(null);
     setAnalysis(null);
+    setTaskId(null);
+    setMomentExplanation(null);
+    setIsAnalyzingMoment(false);
+  };
+
+  const handleAnalyzeMoment = async () => {
+    if (!videoRef.current || !taskId) return;
+    
+    videoRef.current.pause();
+    const time = videoRef.current.currentTime;
+    
+    setIsAnalyzingMoment(true);
+    setMomentExplanation(null);
+    
+    try {
+      const res = await axios.get(`http://localhost:8000/analyze_moment/${taskId}/${time}`);
+      setMomentExplanation(res.data.explanation);
+    } catch (error) {
+      setMomentExplanation("Failed to analyze this moment. Please try again.");
+    } finally {
+      setIsAnalyzingMoment(false);
+    }
   };
 
   return (
@@ -99,7 +126,48 @@ function App() {
             </div>
 
             {/* Video player */}
-            <VideoPlayer url={downloadUrl} />
+            <div className="w-full relative">
+              <VideoPlayer ref={videoRef} url={downloadUrl} />
+              
+              {/* Analyze Moment Button overlay-ish or below */}
+              <div className="mt-4 flex flex-col items-center gap-4">
+                <button
+                  onClick={handleAnalyzeMoment}
+                  disabled={isAnalyzingMoment}
+                  className="glow-btn"
+                  style={{ 
+                    background: isAnalyzingMoment ? '#2A2A2A' : 'rgba(124,58,237,0.15)', 
+                    border: '1px solid currentColor', 
+                    color: '#A78BFA', 
+                    padding: '0.6rem 1.5rem', 
+                    borderRadius: '0.75rem', 
+                    fontSize: '0.9rem', 
+                    fontWeight: 700,
+                    cursor: isAnalyzingMoment ? 'wait' : 'pointer'
+                  }}
+                >
+                  {isAnalyzingMoment ? '🧠 Analyzing Moment...' : '✨ Explain This Moment'}
+                </button>
+
+                {momentExplanation && (
+                  <div className="animate-fade-in" style={{ 
+                    background: 'rgba(124,58,237,0.05)', 
+                    border: '1px solid rgba(124,58,237,0.2)', 
+                    borderRadius: '0.75rem', 
+                    padding: '1rem 1.5rem',
+                    maxWidth: '600px',
+                    textAlign: 'center'
+                  }}>
+                    <p style={{ color: '#A78BFA', fontWeight: 800, fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: '0.5rem' }}>
+                      AI Explanation
+                    </p>
+                    <p style={{ color: '#eee', fontSize: '0.95rem', lineHeight: 1.5 }}>
+                      {momentExplanation}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
 
             {/* Action buttons */}
             <div className="flex gap-4 flex-wrap justify-center">

@@ -1,0 +1,75 @@
+{
+  "subtitles": [
+    [
+      "You will receive: Full transcript of the video (with timestamps if available).",
+      "Highlight segment text: Audio unavailable or failed to transcribe.",
+      "Current timestamp segment for pause analysis: 3.5s to 4.9s"
+    ],
+    [
+      "You will be given a specific timestamp segment, and I will explain what is happening at that moment. Please focus on meaning, not just words."
+    ],
+    [
+      "You will receive all six analyses as defined in the system instructions.",
+      "Please provide all six analyses as defined in the system instructions. Ensure they are relevant to short-form content (reels)."
+    ],
+    [
+      "The provided transcript includes no subtitles or raw text. You may need additional context for these explanations."
+    ],
+    [
+      "The output format is valid and matches the exact JSON structure specified. The summary of the video is clear, with all key points extracted.",
+      "A note was generated from the full transcript into structured notes, including bullet points to summarize key concepts and insights.",
+      "The video title generation part focused on creating 5 highly engaging, viral-style short video titles that were concise, catchy, and emotionally triggered where relevant."
+    ],
+    [
+      "Please provide a clear summary of the video, extracting key points and identifying its tone and purpose. Include important segments/topics discussed to enhance engagement.",
+      "An analysis was provided on what is happening at specific timestamps using the given timestamp segment for pause analysis."
+    ],
+    [
+      "The system will generate summaries and key topics from the full transcript into structured notes, highlighting key concepts and insights in bullet point form suitable for study/reference. The notes are meant to be structured, clear, and relevant to short-form content (reels)."
+    ],
+    [
+      "Please provide a concise summary of the video, extracting key points, identifying its tone and purpose, and mentioning important segments/topics discussed."
+    ],
+    [
+      "To generate subtitles, I need access to an audio transcript or the raw text. The current timestamp segment does not have any specific context or relevance for generating relevant subtitles or titles based on content."
+    ]
+  ],
+  "impact_analysis": {
+    "type": "educational",
+    "score": 8,
+    "reason": "The highlight segment discusses important educational topics such as climate change and recycling, which are typically covered in an educational setting."
+  },
+  "title_generation": [
+    [
+      "How to Reduce Your Carbon Footprint: Tips for a Sustainable Future",
+      "5 Simple Steps Towards Zero Waste",
+      "Make Recycling a Habit, Not a Chore",
+      "Zero Wastage Starts with You",
+      "Transforming Our Environment One Clean Action at a Time"
+    ]
+  ],
+  "notes": {
+    "summary": "...",
+    "key_points": [
+      "The transcript is about environmental and educational topics. Key concepts include climate change, recycling, and sustainable living.",
+      "Key insights are highlighted through the use of specific phrases and sentences in the video's raw text."
+    ]
+  },
+  "full_analysis": {
+    "summary": "...",
+    "key_topics": [
+      "Educational Content",
+      "Environmental Awareness",
+      "Sustainable Living"
+    ],
+    "tone": "Informative and Engaging",
+    "purpose": "To educate viewers on how to reduce their carbon footprint through sustainable practices.",
+    "important_segments": [
+      "The video discusses climate change, recycling methods, and zero waste living. These topics are commonly discussed in educational settings for raising environmental awareness."
+    ]
+  },
+  "pause_analysis": [
+    "3.5s: The content shifts from a general overview of the topic to more specific examples, such as how to reduce carbon emissions through transportation.",
+    "4.9s: There is a change in tone indicating a slight shift towards an explanation or demonstration."
+  ]
+}
