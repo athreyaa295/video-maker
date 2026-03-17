@@ -13,7 +13,7 @@ TARGET_RESOLUTION = (1280, 720)  # 720p for GPU memory efficiency
 OLLAMA_API_URL = "http://localhost:11434/api/generate"
 BATCH_SIZE = 16   # Adjust for 8GB VRAM (8–16 is safe)
 HIGHLIGHT_DURATION = 60  # Target highlight reel duration in seconds
-MODEL_NAME = "qwen2.5vl:3b-q4_K_M"
+MODEL_NAME = "qwen2.5:1.5b"
 
 # Load the LLM system prompt from file
 PROMPT_PATH = os.path.join(os.path.dirname(__file__), "llm_system_prompt.txt")
