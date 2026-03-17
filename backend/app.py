@@ -52,8 +52,13 @@ async def upload_video(background_tasks: BackgroundTasks, file: UploadFile = Fil
 def run_pipeline(task_id: str, input_path: str, output_path: str):
     try:
         tasks_status[task_id]["message"] = "Extracting audio and transcribing..."
-        process_video(input_path, output_path, status_callback=lambda msg: update_status(task_id, msg))
-        tasks_status[task_id] = {"status": "completed", "output_file": output_path, "message": "Highlight extraction complete."}
+        rich_analysis = process_video(input_path, output_path, status_callback=lambda msg: update_status(task_id, msg))
+        tasks_status[task_id] = {
+            "status": "completed",
+            "output_file": output_path,
+            "message": "Highlight extraction complete.",
+            "analysis": rich_analysis or {}
+        }
     except Exception as e:
         tasks_status[task_id] = {"status": "failed", "message": str(e)}
 
@@ -82,6 +87,17 @@ async def download_highlight(task_id: str):
         
     return FileResponse(output_path, media_type="video/mp4", filename="highlight.mp4")
 
+@app.get("/analysis/{task_id}")
+async def get_analysis(task_id: str):
+    if task_id not in tasks_status:
+        return JSONResponse(status_code=404, content={"message": "Task not found"})
+    task_data = tasks_status[task_id]
+    if task_data.get("status") != "completed":
+        return JSONResponse(status_code=400, content={"message": "Processing not completed yet"})
+    return task_data.get("analysis", {})
+
 @app.get("/")
 def health_check():
-    return {"status": "ok", "gpu_enabled": True} # Simplified for now
+    import torch
+    return {"status": "ok", "gpu_enabled": torch.cuda.is_available()}
+

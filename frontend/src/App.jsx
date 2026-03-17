@@ -3,6 +3,7 @@ import axios from 'axios';
 import UploadForm from './components/UploadForm';
 import ProgressIndicator from './components/ProgressIndicator';
 import VideoPlayer from './components/VideoPlayer';
+import AnalysisPanel from './components/AnalysisPanel';
 import './styles/App.scss';
 
 function App() {
@@ -10,6 +11,7 @@ function App() {
   const [status, setStatus] = useState('idle'); // idle, uploading, processing, completed, error
   const [message, setMessage] = useState('');
   const [downloadUrl, setDownloadUrl] = useState(null);
+  const [analysis, setAnalysis] = useState(null);
 
   const handleUpload = async (file) => {
     setStatus('uploading');
@@ -46,6 +48,11 @@ function App() {
           clearInterval(interval);
           setStatus('completed');
           setDownloadUrl(`http://localhost:8000/download/${id}`);
+          // Fetch rich AI analysis
+          try {
+            const aRes = await axios.get(`http://localhost:8000/analysis/${id}`);
+            setAnalysis(aRes.data);
+          } catch (_) { /* analysis optional */ }
         } else if (res.data.status === 'error' || res.data.status === 'failed') {
           clearInterval(interval);
           setStatus('error');
@@ -63,6 +70,7 @@ function App() {
     setStatus('idle');
     setMessage('');
     setDownloadUrl(null);
+    setAnalysis(null);
   };
 
   return (
@@ -85,6 +93,7 @@ function App() {
         
         {status === 'completed' && downloadUrl && (
           <div className="w-full flex flex-col items-center animate-fade-in">
+            {analysis && <AnalysisPanel analysis={analysis} />}
             <VideoPlayer url={downloadUrl} />
             <div className="mt-8 flex gap-4">
                <a 
