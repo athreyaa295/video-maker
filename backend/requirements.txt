@@ -1,0 +1,11 @@
+fastapi
+uvicorn
+opencv-python
+moviepy
+librosa
+torch
+torchaudio
+transformers
+openai-whisper
+python-multipart
+requests
