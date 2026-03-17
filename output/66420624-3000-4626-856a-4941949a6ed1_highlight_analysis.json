@@ -1,0 +1,41 @@
+{
+  "subtitles": {
+    "0:00:00.00, 0:00:05.98": "The video will not play.",
+    "0:00:06.10, 0:00:12.34": "Please insert audio or transcript to proceed.",
+    "0:00:12.35, 0:00:17.98": "A video will play here.",
+    "0:00:18.00, 0:00:22.00": "Subtitle text appears for the first time.",
+    "0:00:22.01, 0:00:35.67": "The video ends here."
+  },
+  "impact_analysis": {
+    "type": "Educational",
+    "score": 8,
+    "reason": "The content discusses various topics aimed at improving physical health, including regular exercise, proper nutrition, and relaxation techniques to reduce stress. The speaker provides clear instructions on how to achieve a balanced lifestyle through these methods."
+  },
+  "titles": [
+    "Boost Your Health: A Comprehensive Guide",
+    "Stay Fit & Happy with Ease",
+    "The Ultimate 7-Day Wellness Plan",
+    "Mind Over Matter: Stress Relief Tips",
+    "Get Energized and Balanced!"
+  ],
+  "notes": {
+    "summary": "- The video contains instructions on how to achieve a balanced lifestyle through regular exercise, proper nutrition, and relaxation techniques. - Clear language is used throughout the video.",
+    "key_points": [
+      "Regular Exercise",
+      "Proper Nutrition",
+      "Relaxation Techniques",
+      "Stress Relief"
+    ]
+  },
+  "full_analysis": {
+    "summary": "The video provides a comprehensive guide on achieving a balanced lifestyle through various health-improving methods. The speaker emphasizes the importance of regular exercise, proper nutrition, and relaxation techniques in reducing stress.",
+    "key_topics": [
+      "Balanced Lifestyle",
+      "Exercise",
+      "Nutrition",
+      "Stress Relief"
+    ],
+    "tone": "Educational & Motivational"
+  },
+  "pause_analysis": "The video content pauses at 35.7 seconds to 41.2 seconds, where the speaker introduces themselves and begins providing instructions on how to achieve a balanced lifestyle through regular exercise, proper nutrition, and relaxation techniques."
+}

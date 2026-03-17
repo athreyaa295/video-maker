@@ -1,10 +1,54 @@
 const AnalysisPanel = ({ analysis }) => {
   const isEmpty = !analysis || Object.keys(analysis).length === 0;
 
-  const card = (icon, title, color, children) => (
+  const handleDownloadNotes = () => {
+    if (!analysis?.notes) return;
+    
+    const { summary, key_points } = analysis.notes;
+    let content = "VIDEO HIGHLIGHT NOTES\n";
+    content += "=====================\n\n";
+    content += "SUMMARY:\n";
+    content += summary + "\n\n";
+    content += "KEY POINTS:\n";
+    key_points.forEach((point, i) => {
+      content += `${i + 1}. ${point}\n`;
+    });
+
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'video_notes.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const card = (icon, title, color, children, hasAction = false) => (
     <div className="analysis-card" key={title}>
-      <div className="card-title" style={{ color }}>
-        <span>{icon}</span> {title}
+      <div className="flex justify-between items-center mb-3">
+        <div className="card-title" style={{ color, margin: 0 }}>
+          <span>{icon}</span> {title}
+        </div>
+        {hasAction && (
+          <button 
+            onClick={handleDownloadNotes}
+            style={{ 
+              background: 'rgba(76,175,80,0.1)', 
+              border: '1px solid rgba(76,175,80,0.3)', 
+              color: '#4CAF50', 
+              padding: '0.3rem 0.8rem', 
+              borderRadius: '0.5rem', 
+              fontSize: '0.75rem', 
+              fontWeight: 700,
+              cursor: 'pointer'
+            }}
+            className="hover:bg-green-600/20 transition-colors"
+          >
+            📥 Download .txt
+          </button>
+        )}
       </div>
       {children}
     </div>
@@ -72,7 +116,8 @@ const AnalysisPanel = ({ analysis }) => {
                 ))}
               </ul>
             )}
-          </div>
+          </div>,
+          true
         )}
 
         {full_analysis && card('🎬', 'Full Video Analysis', '#FFC107',
